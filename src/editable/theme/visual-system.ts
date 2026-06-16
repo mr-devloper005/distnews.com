@@ -11,18 +11,18 @@ export type Slot4VisualPreset =
 
 export const visualPresets = {
   'editorial-paper': {
-    label: 'Editorial Paper',
-    mood: 'calm magazine authority',
-    fontDirection: 'serif headlines with quiet sans body',
+    label: 'Media Distribution',
+    mood: 'premium PR platform authority',
+    fontDirection: 'modern sans headlines with crisp data labels',
     colors: {
-      background: '#f7f4ef',
-      foreground: '#111111',
-      muted: '#66615b',
-      primary: '#111111',
-      accent: '#c92f2f',
+      background: '#f4f7fb',
+      foreground: '#111827',
+      muted: '#4b5563',
+      primary: '#101827',
+      accent: '#00b981',
       surface: '#ffffff',
     },
-    shape: 'sharp newsroom modules with black rules and red feature bands',
+    shape: 'rounded white cards, trust cues, campaign metrics, and balanced content widths',
   },
   'luxury-atelier': {
     label: 'Luxury Atelier',
@@ -121,10 +121,10 @@ export const visualSystem = {
           ? 'tech-directory'
           : 'organic-journal',
   radius: {
-    sm: '0rem',
-    md: '0rem',
-    lg: '0rem',
-    xl: '0rem',
+    sm: '0.75rem',
+    md: '1rem',
+    lg: '1.25rem',
+    xl: '1.5rem',
   },
   motion: {
     pageLoad: 'animate-in fade-in slide-in-from-bottom-4 duration-700',
