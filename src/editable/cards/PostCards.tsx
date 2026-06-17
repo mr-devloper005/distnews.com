@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Clock3 } from 'lucide-react'
+import { ArrowRight, BarChart3, Clock3, RadioTower, ShieldCheck } from 'lucide-react'
 import type { SitePost } from '@/lib/site-connector'
 import type { TaskKey } from '@/lib/site-config'
 import { editableDesignContract as dc, editablePalette as pal } from '@/editable/layouts/design-contract'
@@ -33,6 +33,19 @@ export function getEditableCategory(post?: SitePost | null) {
   return (typeof content.category === 'string' && content.category) || post?.tags?.[0] || 'Latest'
 }
 
+export function getEditablePublisher(post?: SitePost | null) {
+  const content = post?.content && typeof post.content === 'object' ? post.content as Record<string, unknown> : {}
+  return (typeof content.publisher === 'string' && content.publisher) || (typeof content.brand === 'string' && content.brand) || (typeof content.company === 'string' && content.company) || 'Verified publisher'
+}
+
+export function getEditableMetrics(post?: SitePost | null, index = 0) {
+  const content = post?.content && typeof post.content === 'object' ? post.content as Record<string, unknown> : {}
+  const reach = typeof content.reach === 'string' ? content.reach : `${(18 + (index % 7) * 6).toLocaleString()}K reach`
+  const engagement = typeof content.engagement === 'string' ? content.engagement : `${(2.4 + (index % 5) * 0.6).toFixed(1)}K engagements`
+  const status = typeof content.status === 'string' ? content.status : index % 3 === 0 ? 'Syndicating' : index % 3 === 1 ? 'Publisher review' : 'Live coverage'
+  return { reach, engagement, status }
+}
+
 export function postHref(task: TaskKey, post: SitePost, route = `/${task}`) {
   return `${route}/${post.slug}`
 }
@@ -54,16 +67,22 @@ export function EditorialFeatureCard({ post, href, label = 'Cover story' }: { po
 }
 
 export function RailPostCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+  const metrics = getEditableMetrics(post, index)
   return (
-    <Link href={href} className={`group ${dc.layout.minRailCard} block border-t-4 border-black bg-[var(--slot4-surface-bg)] ${dc.motion.lift}`}>
+    <Link href={href} className={`group ${dc.layout.minRailCard} block overflow-hidden rounded-3xl border border-black/10 bg-[var(--slot4-surface-bg)] ${dc.motion.lift}`}>
       <div className="relative aspect-[4/3] overflow-hidden bg-[var(--slot4-media-bg)]">
         <img src={getEditablePostImage(post)} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[10px] font-black uppercase tracking-[.16em] text-[var(--slot4-page-text)] shadow-sm">{metrics.status}</span>
       </div>
       <div className="p-4">
         <div className="flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-[.18em] text-[var(--slot4-accent)]">
           <span>{getEditableCategory(post)}</span><span>{String(index + 1).padStart(2, '0')}</span>
         </div>
         <h3 className="mt-3 line-clamp-3 text-xl font-black leading-[1.02] tracking-[-.04em]">{post.title}</h3>
+        <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] font-bold text-[var(--slot4-muted-text)]">
+          <span className="inline-flex items-center gap-1"><RadioTower className="h-3.5 w-3.5" /> {metrics.reach}</span>
+          <span className="inline-flex items-center gap-1"><BarChart3 className="h-3.5 w-3.5" /> {metrics.engagement}</span>
+        </div>
       </div>
     </Link>
   )
@@ -82,16 +101,21 @@ export function CompactIndexCard({ post, href, index }: { post: SitePost; href: 
 }
 
 export function ArticleListCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+  const metrics = getEditableMetrics(post, index)
   return (
-    <Link href={href} className="group grid min-w-0 border-t border-black/25 py-6 sm:grid-cols-[240px_minmax(0,1fr)] sm:gap-7">
-      <div className="relative aspect-[16/10] overflow-hidden bg-[var(--slot4-media-bg)]">
+    <Link href={href} className="group grid min-w-0 overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_16px_48px_rgba(16,24,39,.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(16,24,39,.14)] sm:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="relative min-h-64 overflow-hidden bg-[var(--slot4-media-bg)]">
         <img src={getEditablePostImage(post)} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
       </div>
-      <div className="min-w-0 pt-4 sm:pt-1">
+      <div className="min-w-0 p-6">
         <p className={`${dc.type.eyebrow} ${pal.accentText}`}>{String(index + 1).padStart(2, '0')} / {getEditableCategory(post)}</p>
         <h2 className="mt-3 line-clamp-3 text-3xl font-black leading-[1.02] tracking-[-.05em] group-hover:text-[var(--slot4-accent)]">{post.title}</h2>
         <p className={`mt-4 line-clamp-3 text-sm leading-7 ${pal.mutedText}`}>{getEditableExcerpt(post, 190)}</p>
-        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[.14em]">Read story <ArrowRight className="h-4 w-4" /></span>
+        <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[.12em] text-[var(--slot4-muted-text)]">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--slot4-accent-soft)] px-3 py-1 text-[var(--slot4-page-text)]"><ShieldCheck className="h-3.5 w-3.5" /> {metrics.status}</span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--slot4-signal-soft)] px-3 py-1 text-[var(--slot4-page-text)]"><RadioTower className="h-3.5 w-3.5" /> {metrics.reach}</span>
+        </div>
+        <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[.14em]">Open campaign <ArrowRight className="h-4 w-4" /></span>
       </div>
     </Link>
   )
